@@ -15,9 +15,10 @@ export interface IIconButtonProps {
     Icon: any;
     mt: string;
     isActivate?: boolean;
+    onPress?: any;
 }
 
-export default function IconButtonHome({ title, Icon, mt, isActivate }: IIconButtonProps) {
+export default function IconButtonHome({ title, Icon, mt, isActivate, onPress }: IIconButtonProps) {
     return (
         <Stack
             sx={{
@@ -26,6 +27,7 @@ export default function IconButtonHome({ title, Icon, mt, isActivate }: IIconBut
                 cursor: 'pointer',
                 mt: `${mt} !important`,
             }}
+            onClick={onPress}
         >
             <Tooltip title={title} placement="right-start">
                 <CustomIcon>

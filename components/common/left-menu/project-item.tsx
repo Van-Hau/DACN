@@ -1,138 +1,205 @@
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useState } from 'react';
+import {
+    Collapse,
+    List,
+    ListItemButton,
+    ListItemText,
+    Stack,
+    Typography,
+    Tooltip,
+    ClickAwayListener,
+    MenuList,
+    MenuItem,
+    Button,
+    Menu,
+    Paper,
+    Popper,
+    Grow,
+    IconButton,
+    Box,
+} from '@mui/material';
+import { useEffect, useState, useRef } from 'react';
+import PacketItem from './packet-item';
+import { packageApi } from '@/api/package';
+import { useAppSelector } from '@/hooks/useRedux';
 
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
-import { Stack, Typography, Tooltip } from '@mui/material';
-import { useRouter } from 'next/router';
-import { RootStateOrAny, useSelector } from 'react-redux';
+// import { PopoverSettingTeam } from '@/components/common';
+export interface ProjectItemProps {
+    name: string;
+    handleAddpackage?: any;
+    idProject: string;
+    handleAddMember?: any;
+    isAdmin?: boolean;
+    handleAddMemberPackage?: any;
+    handleCreateClass?: any;
+}
 
-export interface ProjectItemProps {}
+export function ProjectItem(props: ProjectItemProps) {
+    const {
+        handleAddpackage,
+        idProject,
+        handleAddMember,
+        isAdmin,
+        handleAddMemberPackage,
+        handleCreateClass,
+    } = props;
 
-export default function ProjectItem(props: ProjectItemProps) {
+    const [open, setOpen] = useState(false);
+    const [showPacket, setShowPacket] = useState(false);
+    const profile = useAppSelector((state) => state.user);
+    const [listPacket, setListPacket] = useState<any>([]);
+
+    const anchorRef = useRef<HTMLButtonElement>(null);
+    const handleToggle = (e: any) => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event: Event | React.SyntheticEvent) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+            return;
+        }
+        setOpen(false);
+    };
+
+    useEffect(() => {
+        if (!showPacket || !profile?.id) {
+            setListPacket([]);
+            return;
+        }
+        (async () => {
+            const { data } = await packageApi.getByIdUser(profile?.id, idProject);
+            setListPacket(data);
+        })();
+    }, [showPacket, profile?.id, idProject]);
+
     return (
-        <Stack
-            direction="row"
-            sx={{
-                p: '2px 5px 2px 5px',
-                cursor: 'pointer',
-                ':hover': {
-                    bgcolor: '#00000010',
-                    '& .show-icon-setting-child': {
-                        opacity: 1,
-                    },
-                    borderRadius: '4px',
-                },
-                '&.Mui-selected': {
-                    bgcolor: '#428bca40',
-                },
-
-                '&:hover': {
-                    backgroundColor: '#EEEEEE',
-                    color: 'black',
-                },
-                background: 'linear-gradient(to left, #9cecfb, #65c7f7, #0052d4)',
-                // : '#fff',
-                borderRadius: '4px',
-            }}
-            alignItems={'center'}
-            justifyItems={'center'}
+        <List
+            sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', p: 0 }}
+            component="nav"
         >
-            <Stack
+            <ListItemButton
                 sx={{
-                    width: '100%',
-                    flexDirection: 'row',
-                    ml: 1,
+                    position: 'relative',
+                    p: '2px',
+                    ':hover': {
+                        '& .show-icon-setting': {
+                            opacity: 1,
+                        },
+                    },
                 }}
             >
-                <StarIcon
-                    sx={{
-                        fontSize: '20px',
-                        mr: 1,
-                        color: '#ffcd40',
-                        zIndex: 1,
-                    }}
-                />
-
-                {/* <StarBorderOutlinedIcon
+                <BookOutlinedIcon sx={{ fontSize: '20px', mr: 1 }} />
+                <ListItemText onClick={() => setShowPacket(!showPacket)}>
+                    <Typography
                         sx={{
-                            fontSize: '20px',
-                            mr: 1,
-                            zIndex: 1,
+                            fontWeight: 600,
+                            color: '#10375e',
+                            fontSize: '14px',
+                            textTransform: 'uppercase',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            ' -webkit-line-clamp': 1,
+                            WebkitBoxOrient: 'vertical',
+                            width: '100%',
                         }}
-                        onClick={() => handleSetFavorite(!project.IsFavorite)}
-                    /> */}
+                    >
+                        {props.name}
+                    </Typography>
+                </ListItemText>
+                {isAdmin && (
+                    <Button
+                        ref={anchorRef}
+                        id="composition-button"
+                        onClick={(e: any) => handleToggle(e)}
+                    >
+                        <SettingsIcon
+                            // onClick={handleClickMenuSetting}
+                            className="show-icon-setting"
+                            sx={{ color: 'silver', fontSize: '16px', opacity: 0 }}
+                        />
+                    </Button>
+                )}
 
-                <Typography
+                <Box
                     sx={{
-                        fontSize: '15px',
-                        color: '#fff',
-                        //  '#0f2244',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        ' -webkit-line-clamp': 1,
-                        WebkitBoxOrient: 'vertical',
-                        width: '100%',
-                        fontWeight: 600,
-                        // : 400,
+                        position: 'absolute',
+                        bottom: '0',
+                        transform: 'translateY(calc(100%))',
+                        right: '10px',
+                        zIndex: '10',
+                        display: open ? 'block' : 'none',
+                        boxShadow:
+                            'rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px',
                     }}
                 >
-                    Project Name
-                </Typography>
-            </Stack>
-            <Stack spacing={'2px'} sx={{ ml: 'auto', alignItems: 'center' }} direction={'row'}>
-                <SettingsIcon
-                    className="show-icon-setting-child"
-                    sx={{
-                        color: 'silver',
-                        fontSize: '16px',
-                        opacity: 0,
-                        ':hover': { color: '#428bca' },
-                    }}
-                />
+                    <Paper>
+                        <ClickAwayListener onClickAway={handleClose}>
+                            <MenuList
+                                id="composition-menu"
+                                aria-labelledby="composition-button"
+                                autoFocusItem={open}
+                            >
+                                <MenuItem
+                                    onClick={() => {
+                                        handleAddpackage(idProject);
+                                    }}
+                                >
+                                    Thêm kế hoạch
+                                </MenuItem>
 
-                <Tooltip title="Công việc chưa xem" placement="right">
-                    <Stack
-                        sx={{
-                            width: '20px',
-                            height: '20px',
-                            borderRadius: '3px',
-                            backgroundColor: 'transparent',
-                            border: '1px solid #56595D80',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            // opacity: 0,
-                            ml: '5px',
+                                <MenuItem
+                                    onClick={() => {
+                                        handleAddMember(idProject);
+                                    }}
+                                >
+                                    Quản lý thành viên
+                                </MenuItem>
+                                {/* <MenuItem onClick={handleClose}>Rời dự án</MenuItem> */}
+                            </MenuList>
+                        </ClickAwayListener>
+                    </Paper>
+                </Box>
+                {!showPacket ? (
+                    <IconButton
+                        onClick={() => {
+                            setShowPacket(true);
                         }}
-                        // className="show-icon-setting-child"
                     >
-                        <Typography
-                            sx={{
-                                fontSize: '12px',
-                                color: '#56595D80',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                display: '-webkit-box',
-                                ' -webkit-line-clamp': 1,
-                                WebkitBoxOrient: 'vertical',
-                                fontWeight: 600,
+                        <ArrowDropDownIcon />
+                    </IconButton>
+                ) : (
+                    <IconButton
+                        onClick={() => {
+                            setShowPacket(false);
+                        }}
+                    >
+                        <ArrowDropUpIcon />
+                    </IconButton>
+                )}
+            </ListItemButton>
+
+            <Collapse in={true} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                    {listPacket.map((item: any, index: number) => (
+                        <PacketItem
+                            key={index}
+                            name={item.name}
+                            id={item.id}
+                            isAdmin={isAdmin}
+                            handleAddMember={() => {
+                                handleAddMemberPackage(item.id, idProject);
                             }}
-                        >
-                            99+
-                        </Typography>
-                    </Stack>
-                </Tooltip>
-            </Stack>
-            {/* <PopoverSettingProject
-                project={props.project}
-                idProject={idProject}
-                openProject={openProject}
-                anchorElProject={anchorElProject}
-                handleCloseProject={handleCloseProject}
-                menu={props.menu}
-                userCreateProject={project.UserCreate}
-            /> */}
-        </Stack>
+                            handleCreateClass={() => {
+                                handleCreateClass(item.id, idProject);
+                            }}
+                        />
+                    ))}
+                </List>
+            </Collapse>
+        </List>
     );
 }
