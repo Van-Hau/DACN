@@ -1,0 +1,1 @@
+export const BACK_END_SOCKET_URL = 'http://localhost:9092/chat';
