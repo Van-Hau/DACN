@@ -1,7 +1,9 @@
 import {
     Alert,
+    Backdrop,
     Box,
     Button,
+    CircularProgress,
     FormControl,
     MenuItem,
     OutlinedInput,
@@ -14,17 +16,15 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { authApi } from '@/api/auth-api';
 import { useRouter } from 'next/router';
+import { enqueueSnackbar } from 'notistack';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '@/redux/loading';
 export interface ISignUpComponentProps {
     setSignUp2: any;
-    setToast: any;
     setSingUp: any;
 }
 
-export default function SignUpComponent({
-    setSignUp2,
-    setToast,
-    setSingUp,
-}: ISignUpComponentProps) {
+export default function SignUpComponent({ setSignUp2, setSingUp }: ISignUpComponentProps) {
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
@@ -36,6 +36,7 @@ export default function SignUpComponent({
     const [scaleWork, setScaleWork] = useState('');
     const [frontendUrl, setUrl] = useState('');
     const router = useRouter();
+    const dispatch = useDispatch();
     const handleSingin2 = () => {
         setSignUp2('');
     };
@@ -45,62 +46,48 @@ export default function SignUpComponent({
 
     const handleRegister = async () => {
         if (email === '') {
-            setToast({ open: true, message: 'Email không được để trống', severity: 'error' });
+            enqueueSnackbar('Email không được để trống', { variant: 'error' });
             return;
         }
         if (name === '') {
-            setToast({ open: true, message: 'Họ và tên không được để trống', severity: 'error' });
+            enqueueSnackbar('Họ và tên không được để trống', { variant: 'error' });
             return;
         }
         if (phone === '') {
-            setToast({
-                open: true,
-                message: 'Số điện thoại không được để trống',
-                severity: 'error',
-            });
+            enqueueSnackbar('Số điện thoại không được để trống', { variant: 'error' });
             return;
         }
         if (company === '') {
-            setToast({ open: true, message: 'Tên công ty không được để trống', severity: 'error' });
+            enqueueSnackbar('Tên công ty không được để trống', { variant: 'error' });
             return;
         }
         if (password === '') {
-            setToast({ open: true, message: 'Mật khẩu không được để trống', severity: 'error' });
+            enqueueSnackbar('Mật khẩu không được để trống', { variant: 'error' });
             return;
         }
         if (comfirmPassword === '') {
-            setToast({
-                open: true,
-                message: 'Xác nhận mật khẩu không được để trống',
-                severity: 'error',
-            });
+            enqueueSnackbar('Xác nhận mật khẩu không được để trống', { variant: 'error' });
             return;
         }
         if (positionWork === '') {
-            setToast({
-                open: true,
-                message: 'Vị trí công việc không được để trống',
-                severity: 'error',
-            });
+            enqueueSnackbar('Vị trí công việc không được để trống', { variant: 'error' });
             return;
         }
         if (district === '') {
-            setToast({ open: true, message: 'Quận/Huyện không được để trống', severity: 'error' });
+            enqueueSnackbar('Quận/Huyện không được để trống', { variant: 'error' });
             return;
         }
         if (scaleWork === '') {
-            setToast({
-                open: true,
-                message: 'Quy mô công ty không được để trống',
-                severity: 'error',
-            });
+            enqueueSnackbar('Quy mô công ty không được để trống', { variant: 'error' });
             return;
         }
 
         if (password !== comfirmPassword) {
-            setToast({ open: true, message: 'Mật khẩu không khớp', severity: 'error' });
+            enqueueSnackbar('Mật khẩu không khớp', { variant: 'error' });
             return;
         }
+        dispatch(setLoading(true));
+
         const payload: any = {
             company: company,
             district: district,
@@ -114,23 +101,28 @@ export default function SignUpComponent({
         };
         try {
             const { data } = await authApi.signUp(payload);
-            console.log(data);
             if (data && data?.token) {
-                setToast({ open: true, message: 'Đăng ký thành công', severity: 'success' });
                 // setSingUp('');
+                enqueueSnackbar('Đăng ký thành công', { variant: 'success' });
                 router.push('/verify');
             } else {
-                setToast({ open: true, message: data?.errors?.errorMessage, severity: 'error' });
+                enqueueSnackbar(data?.errors?.errorMessage, { variant: 'error' });
             }
         } catch (error: any) {
             //get message error
-            const { errors } = error.response.data;
+            const { errors } = error?.response?.data;
+            console.log(errors);
             let message = '';
             for (const key in errors) {
                 message += errors[key];
                 break;
             }
-            setToast({ open: true, message: message, severity: 'error' });
+            if (errors) enqueueSnackbar(message, { variant: 'error' });
+            else if (error?.response?.data?.message)
+                enqueueSnackbar(error?.response?.data?.message, { variant: 'error' });
+            else enqueueSnackbar('Đăng ký thất bại', { variant: 'error' });
+        } finally {
+            dispatch(setLoading(false));
         }
     };
     return (

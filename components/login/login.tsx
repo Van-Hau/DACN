@@ -13,19 +13,21 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import PersonIcon from '@mui/icons-material/Person';
 import { authApi } from '@/api/auth-api';
 import { useRouter } from 'next/router';
-
+import { enqueueSnackbar } from 'notistack';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '@/redux/loading';
 export interface ILoginComponentProps {
     setSignUp2: any;
-    setToast: any;
 }
 
-export default function LoginComponent({ setSignUp2, setToast }: ILoginComponentProps) {
+export default function LoginComponent({ setSignUp2 }: ILoginComponentProps) {
     const [nameSignIn, setNameSignIn] = useState('');
     const router = useRouter();
 
     const [passwordSignIn, setPasswordSignIn] = useState('');
 
     const [showPassword, setShowPassword] = useState(false);
+    const dispatch = useDispatch();
 
     const [type, setType] = useState('password');
     const handleClickShowPassword = () => {
@@ -38,11 +40,11 @@ export default function LoginComponent({ setSignUp2, setToast }: ILoginComponent
     };
     const handleLogin = async () => {
         if (nameSignIn === '') {
-            setToast({ open: true, message: 'Email không được để trống', severity: 'error' });
+            enqueueSnackbar('Email không được để trống', { variant: 'error' });
             return;
         }
         if (passwordSignIn === '') {
-            setToast({ open: true, message: 'Password không được để trống', severity: 'error' });
+            enqueueSnackbar('Password không được để trống', { variant: 'error' });
             return;
         }
         const payload = {
@@ -50,11 +52,23 @@ export default function LoginComponent({ setSignUp2, setToast }: ILoginComponent
             password: passwordSignIn,
         };
         try {
+            dispatch(setLoading(true));
+
             const { data } = await authApi.login(payload);
-            setToast({ open: true, message: data.message, severity: 'success' });
-            router.push('/home');
+            enqueueSnackbar(data.message, { variant: 'success' });
+            router.push(
+                {
+                    pathname: '/home',
+                    query: {
+                        data: data,
+                    },
+                },
+                '/home'
+            );
         } catch (error: any) {
-            setToast({ open: true, message: 'login faill !', severity: 'error' });
+            enqueueSnackbar('Login faill !', { variant: 'error' });
+        } finally {
+            dispatch(setLoading(false));
         }
     };
 
