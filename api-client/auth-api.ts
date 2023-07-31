@@ -1,3 +1,4 @@
+import { NewMemberPayload } from './../models/user';
 import { VerifyPayload } from './../models/auth';
 import { LoginPayload, RegisterPayload } from '@/models/index';
 import axiosClient from './axios-client';
@@ -9,10 +10,6 @@ export const authApi = {
 
     logout() {
         return axiosClient.post('/logout');
-    },
-
-    getProfile() {
-        return axiosClient.get('/profile');
     },
     signUp(payload: RegisterPayload) {
         return axiosClient.post('/signup', payload);

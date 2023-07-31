@@ -1,0 +1,29 @@
+.emergency {
+    --angle: 0deg;
+    border: 3px solid;
+    border-image: linear-gradient(var(--angle), #f00000, #fff, #fff, #f00000) 1;
+    animation: 5s rotate linear infinite;
+}
+
+.importance {
+    --angle: 0deg;
+    border: 3px solid;
+    border-image: linear-gradient(var(--angle), #f16529, #fff, #fff, #f16529) 1;
+    animation: 10s rotate linear infinite;
+}
+.medium {
+    --angle: 0deg;
+    border: 3px solid;
+    border-image: linear-gradient(var(--angle), #ff0, #fff, #fff, #fffc00) 1;
+    animation: 15s rotate linear infinite;
+}
+@keyframes rotate {
+    to {
+        --angle: 360deg;
+    }
+}
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}

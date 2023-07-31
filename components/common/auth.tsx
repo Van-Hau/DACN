@@ -1,6 +1,7 @@
-import { useAuth } from '@/hooks/auth-hook';
-import { LayoutProps } from '@/models/common';
-import { Stack } from '@mui/material';
+import { userApi } from '@/api/index';
+import { notifyApi } from '@/api/notify-api';
+import { useAppDispatch } from '@/hooks/useRedux';
+import { setLoading, setNotification, setUser } from '@/redux/index';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
@@ -10,23 +11,24 @@ export interface AuthAminProps {
 
 export function Auth({ children }: AuthAminProps) {
     const router = useRouter();
-    const { profile, firstLoading } = useAuth();
-
-    const convertProfileType: any = profile;
-    const userID = convertProfileType?.data?.id;
-    // console.log(firstLoading);
+    const dispatch = useAppDispatch();
     useEffect(() => {
-        // if (!profile) {
-        //     router.push('/login');
-        // }
-        if (!firstLoading && !userID) {
-            localStorage.removeItem('isLogin');
-            localStorage.setItem('isLogin', '0');
-            router.push('/login');
-        }
-    }, [router, profile, firstLoading, userID]);
-
-    if (!userID) return <></>;
+        (async () => {
+            try {
+                const { data } = await userApi.getProfile();
+                const { data: notification } = await notifyApi.getNotification(data.id);
+                dispatch(setLoading(false));
+                dispatch(setUser(data));
+                dispatch(setNotification(notification));
+                if (!data?.id) {
+                    router.push('/login');
+                    return;
+                }
+            } catch (error) {
+                router.push('/login');
+            }
+        })();
+    }, []);
 
     return <div>{children}</div>;
 }
