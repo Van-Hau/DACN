@@ -19,6 +19,8 @@ import {
     Stack,
     CardMedia,
     StyledEngineProvider,
+    Backdrop,
+    CircularProgress,
 } from '@mui/material';
 import { Fragment, useState, useEffect, useRef } from 'react';
 import Man from '@/images/home/man.png';
@@ -40,6 +42,9 @@ import { StylesProvider, createGenerateClassName } from '@mui/styles';
 import { style } from '@mui/system';
 import Footer from '@/components/home/Footer';
 import { useRouter } from 'next/router';
+import { userApi } from '../api-client';
+import { useAppDispatch } from '@/hooks/useRedux';
+import { setUser } from '@/redux/home';
 const classes = {
     sticky: {
         '&.sticky': {
@@ -140,10 +145,27 @@ const Home: NextPageWithLayout = () => {
     const [active, setActive] = useState('');
     const [showLogin, setShowLogin] = useState(false);
     const router = useRouter();
-    const handleClickShowLogin = () => {
-        router.push('/login');
+    const dispatch = useAppDispatch();
+    const handleClickShowLogin = async () => {
+        try {
+            setLoading(true);
+            const { data } = await userApi.getProfile();
+            console.log(data);
+            if (!data?.id) {
+                router.push('/login');
+            } else {
+                router.push('/home');
+                dispatch(setUser(data));
+            }
+        } catch (error) {
+            router.push('/login');
+            setShowLogin(false);
+        } finally {
+            setShowLogin(false);
+        }
     };
     const [showSignUp, setShowSignUp] = useState(false);
+    const [loading, setLoading] = useState(false);
     const handleClickShowSignUp = () => {
         router.push('/login');
     };
@@ -165,6 +187,15 @@ const Home: NextPageWithLayout = () => {
     }, []);
     return (
         <StylesProvider generateClassName={generateClassName} injectFirst>
+            <Backdrop
+                sx={{
+                    color: '#fff',
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                }}
+                open={loading}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
             <Stack
                 sx={{
                     fontFamily: 'Roboto,sans-serif',
