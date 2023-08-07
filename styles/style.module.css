@@ -1,0 +1,119 @@
+/* CSS */
+.button4 {
+    appearance: none;
+    background-color: #fafbfc;
+    border: 1px solid rgba(27, 31, 35, 0.15);
+    border-radius: 6px;
+    box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+    box-sizing: border-box;
+    color: #24292e;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    list-style: none;
+    padding: 6px 16px;
+    position: relative;
+    transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: middle;
+    white-space: nowrap;
+    word-wrap: break-word;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    height: 30px;
+    margin-left: 10px;
+    color: black;
+}
+
+.button4:hover {
+    background-color: #f3f4f6;
+    text-decoration: none;
+    transition-duration: 0.1s;
+}
+
+.button4:disabled {
+    background-color: #fafbfc;
+    border-color: rgba(27, 31, 35, 0.15);
+    color: #959da5;
+    cursor: default;
+}
+
+.button4:active {
+    background-color: #edeff2;
+    box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+    transition: none 0s;
+}
+
+.button4:focus {
+    outline: 1px transparent;
+}
+
+.button4:before {
+    display: none;
+}
+
+.button4:-webkit-details-marker {
+    display: none;
+}
+
+/* loading */
+
+.center {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+}
+.wave {
+    width: 5px;
+    height: 100px;
+    background: linear-gradient(45deg, rgba(0, 113, 188), #fff);
+    margin: 10px;
+    animation: wave 1s linear infinite;
+    border-radius: 20px;
+}
+.wave:nth-child(2) {
+    animation-delay: 0.1s;
+}
+.wave:nth-child(3) {
+    animation-delay: 0.2s;
+}
+.wave:nth-child(4) {
+    animation-delay: 0.3s;
+}
+.wave:nth-child(5) {
+    animation-delay: 0.4s;
+}
+.wave:nth-child(6) {
+    animation-delay: 0.5s;
+}
+.wave:nth-child(7) {
+    animation-delay: 0.6s;
+}
+.wave:nth-child(8) {
+    animation-delay: 0.7s;
+}
+.wave:nth-child(9) {
+    animation-delay: 0.8s;
+}
+.wave:nth-child(10) {
+    animation-delay: 0.9s;
+}
+
+@keyframes wave {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(0);
+    }
+}

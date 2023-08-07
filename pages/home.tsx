@@ -1,28 +1,56 @@
 import { MainLayout } from '@/components/common';
-import { Avatar, IconButton, Popover, Stack, Tooltip } from '@mui/material';
+
+import TaskColumnComponent from '@/components/colum-task/task-column';
+import { Box, Grid, Skeleton, Stack, Typography } from '@mui/material';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import PerfectScrollbar from 'react-perfect-scrollbar';
+import { height } from '@mui/system';
+import { useRef } from 'react';
+
+import HeaderTaskComponent from '@/components/colum-task/header-task';
 import { useRouter } from 'next/router';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useAppSelector } from '@/hooks/useRedux';
 
-import MenuIcon from '@mui/icons-material/Menu';
-import { styled } from '@mui/system';
-import Image from 'next/image';
-import HomeIcon from '@mui/icons-material/Home';
 export interface IHomePageProps {}
-const CustomIcon = styled(Stack)({
-    borderRadius: '10px',
-    cursor: 'pointer',
-    padding: '10px',
-    border: '1px solid #fff',
-    ':hover': {
-        background: 'hsl(0 0% 90%)',
-    },
-});
-function HomePage(props: IHomePageProps) {
-    // const [popoverState, setPopoverState] = useState<
-    //     'notify' | 'importantNotify' | 'chat' | 'search' | 'none' | 'member' | 'menu'
-    // >('none');
 
-    return <Stack></Stack>;
+function HomePage(props: IHomePageProps) {
+    const router = useRouter();
+    const { data } = router.query;
+
+    //lăn chuột scroll ngang
+    const handleScrollX = (e: any) => {
+        // e.preventDefault();
+        e.currentTarget.scrollLeft += e.deltaY;
+    };
+    // onWheel={handleScrollX}
+
+    return (
+        <PerfectScrollbar onWheel={handleScrollX}>
+            <Stack
+                sx={{
+                    backgroundImage: `url(/images/background2.jpg)`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'cover',
+                }}
+            >
+                {/* <HeaderTaskComponent /> */}
+                <Stack
+                    height="94.3vh"
+                    sx={{
+                        flexGrow: 1,
+                        padding: '10px 20px',
+                    }}
+                >
+                    {/* <TaskColumnComponent
+                        listClass={undefined}
+                        listUser={undefined}
+                        setListClass={undefined}
+                        treePackage={undefined}
+                    /> */}
+                </Stack>
+            </Stack>
+        </PerfectScrollbar>
+    );
 }
 HomePage.Layout = MainLayout;
 export default HomePage;
